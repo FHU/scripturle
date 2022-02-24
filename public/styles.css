@@ -63,11 +63,11 @@ input.letter {
 }
 
 input.letter.correct {
-    background-color: #734124;
+    background-color: green;
 }
 
 input.letter.misplaced {
-    background-color: #5D768C;
+    background-color: yellow;
 }
 
 input[type="submit"] {
