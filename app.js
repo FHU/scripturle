@@ -24,11 +24,17 @@ app.post("/v1", (req, res)=> {
 
   let result = []; // = computeResult();
 
-  if(guess === secretWord) {
-    result = ['correct', 'correct', 'correct','correct','correct','correct','correct'];
-  }
-  else {
-    result = ['correct', 'misplaced', 'incorrect','incorrect','incorrect','misplaced','misplaced'];
+  for(letter in guess) {
+    if (letter === secretWord[letter]) {
+      answer = 'correct';
+    }
+    else if (secretWord.includes(letter)){
+      answer = 'misplaced';
+    }
+    else {
+      answer = 'incorrect';
+    }
+    result.push({letter , status: answer});
   }
 
   console.log(result);
