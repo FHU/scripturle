@@ -44,58 +44,30 @@ app.post("/v1", (req, res)=> {
 
 });
 
-
-/* EXAMPLE */
-
-let mark = { first: "Mark", last: "Hamill", age: "70" };
-
-app.get("/example/:age", (req, res) => {
-  let ageSentence = "";
-  const age = parseInt(req.params.age);
-
-  if (age > mark.age) {
-    ageSentence = "You're older than Mark Hamill!";
-  } else if (age < mark.age) {
-    ageSentence = "You're younger than Mark Hamill!";
-  } else {
-    ageSentence = "You are Mark Hamill!";
-  }
-  const page = `<html>
-                    <head> </head>
-                    <body> 
-                      <h1> Example </h1>
-                      <p> ${ageSentence} </p>
-                    </body>
-                </html>`;
-
-  //res.render('index', ageSentence);
-
-  res.send(page);
+app.get('/v2', (req, res)=> {
+  res.render('v2');
 });
 
+app.post("/v2", (req, res)=> {
 
-app.post('/example', (req,res) => {
+  let secretWord = "hebrews".toUpperCase();
 
-  let age = req.body.age;
+  // extract the guess value from the body
+  const guess = req.body.guess.toUpperCase();
 
-  if (age > mark.age) {
-    ageSentence = "You're older than Mark Hamill!";
-  } else if (age < mark.age) {
-    ageSentence = "You're younger than Mark Hamill!";
-  } else {
-    ageSentence = "You are Mark Hamill!";
+  let result = []; // = computeResult();
+
+  if(guess === secretWord) {
+    result = ['correct', 'correct', 'correct','correct','correct','correct','correct'];
   }
-  const page = `<html>
-                    <head> </head>
-                    <body> 
-                      <h1> Example </h1>
-                      <p> ${ageSentence} </p>
-                    </body>
-                </html>`;
+  else {
+    result = ['correct', 'misplaced', 'incorrect','incorrect','incorrect','misplaced','misplaced'];
+  }
 
-  //res.render('index', ageSentence);
+  console.log(result);
 
-  res.send(page);
+  // return the guess
+  res.render('v1', {result: result} ) ;
 
 });
 
