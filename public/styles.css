@@ -60,15 +60,18 @@ input.letter {
 
     font-size: 40px;
     text-align: center;
+    caret-color: transparent;
 }
 
 input.letter.correct {
     /* background-color: #734124; */
-    background-color: #45A1F7;
+    /* background-color: #45A1F7; */
+    background-color: #538D4E;
 }
 
 input.letter.misplaced {
-    background-color: #5D768C;
+    /* background-color: #5D768C; */
+    background-color: #B59F3B;
 }
 
 input[type="submit"] {

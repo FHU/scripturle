@@ -2,24 +2,23 @@
 
     <header>
         <a href="/" class="logo"><i class="fas fa-bible"></i></a>
-        <h1>SCRIPTURLE</h1>
+        <h1>THY WORDLE</h1>
         <a href="" class="settings"><i class="fas fa-cog"></i></a>
     </header>
 
     <main>
 
-        {{!--
-        {{#if result }}
-        <h2> {{ result }} </h2>
-        {{/if}} --}}
-
+        {{#each guesses}}
         <div class="row">
-            {{#each result letter=letter value=value}}
+            {{#each this letter=letter value=value}}
 
             <input type="text" text="" class="letter {{value}}" maxlength="1" disabled value="{{letter}}" />
 
             {{/each}}
         </div>
+        {{/each}}
+
+        {{#unless max}}
         <div class="row">
             <input type="text" text="" class="letter" maxlength="1" autofocus />
             <input type="text" text="" class="letter" maxlength="1" />
@@ -29,6 +28,7 @@
             <input type="text" text="" class="letter" maxlength="1" />
             <input type="text" text="" class="letter" maxlength="1" />
         </div>
+        {{/unless}}
 
         <div class="wordContainer">
             {{!-- <h2 class="guess"></h2> --}}

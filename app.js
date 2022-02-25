@@ -1,12 +1,19 @@
 let express = require("express");
 let path = require("path");
 let app = express();
+let expressSession = require("express-session");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(expressSession({
+  resave: false,
+  saveUninitialized: false,
+  secret: "aberoihg;OUWE4",
+}));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
@@ -40,73 +47,25 @@ app.get('/v2', (req, res) => {
 
 app.post("/v2", (req, res) => {
 
-  let secretWord = "HEBREWS".toUpperCase();
+  if (!req.session.guesses && !req.session.guessCount) {
+    req.session.guesses = [];
+    req.session.guessCount = 0;
+  }
 
-  // extract the guess value from the body
+  let secretWord = "GOLIATH".toUpperCase();
+
+  // extract the guess value from the body & get result
   const guess = req.body.guess.toUpperCase();
-
   let result = getResult(secretWord, guess);
 
-  console.log(result);
+  // add guess to req.session.guesses
+  req.session.guesses.push(result);
+  req.session.guessCount++;
 
-  // return the guess
-  res.render('v2', { result: result });
+  console.log(req.session.guesses, req.session.guessCount);
 
-});
-//#endregion
-
-//#region Example
-/* EXAMPLE */
-
-let mark = { first: "Mark", last: "Hamill", age: "70" };
-
-app.get("/example/:age", (req, res) => {
-  let ageSentence = "";
-  const age = parseInt(req.params.age);
-
-  if (age > mark.age) {
-    ageSentence = "You're older than Mark Hamill!";
-  } else if (age < mark.age) {
-    ageSentence = "You're younger than Mark Hamill!";
-  } else {
-    ageSentence = "You are Mark Hamill!";
-  }
-  const page = `<html>
-                    <head> </head>
-                    <body> 
-                      <h1> Example </h1>
-                      <p> ${ageSentence} </p>
-                    </body>
-                </html>`;
-
-  //res.render('index', ageSentence);
-
-  res.send(page);
-});
-
-
-app.post('/example', (req, res) => {
-
-  let age = req.body.age;
-
-  if (age > mark.age) {
-    ageSentence = "You're older than Mark Hamill!";
-  } else if (age < mark.age) {
-    ageSentence = "You're younger than Mark Hamill!";
-  } else {
-    ageSentence = "You are Mark Hamill!";
-  }
-  const page = `<html>
-                    <head> </head>
-                    <body> 
-                      <h1> Example </h1>
-                      <p> ${ageSentence} </p>
-                    </body>
-                </html>`;
-
-  //res.render('index', ageSentence);
-
-  res.send(page);
+  // return guesses
+  res.render('v2', { guesses: req.session.guesses, max: req.session.guessCount == 7 });
 
 });
 //#endregion
@@ -132,18 +91,14 @@ function getResult(secretWord, guess) {
   // check for correct
   for (let i = 0; i < secretWord.length; i++) {
     if (guess[i] === secretWord[i]) {
-      // resultArray[i] = "correct";
-      // secretCopy = secretCopy.replace(guess[i], "");
       resultArray[i] = { letter: guess[i], value: "correct" };
       secretCopy = secretCopy.replace(guess[i], "");
     }
   }
 
-  // check for misplaced
+  // check for misplaced, otherwise incorrect
   for (let i = 0; i < secretWord.length; i++) {
-    if (secretCopy.includes(guess[i])) {
-      // resultArray[i] = "misplaced";
-      // secretCopy = secretCopy.replace(guess[i], "");
+    if (secretCopy.includes(guess[i]) && resultArray[i] === undefined) {
       resultArray[i] = { letter: guess[i], value: "misplaced" };
       secretCopy = secretCopy.replace(guess[i], "");
     }
@@ -152,16 +107,9 @@ function getResult(secretWord, guess) {
   // fill in rest of array with incorrect
   for (let i = 0; i < secretWord.length; i++) {
     if (resultArray[i] === undefined) {
-      // resultArray[i] = "incorrect";
       resultArray[i] = { letter: guess[i], value: "incorrect" };
     }
   }
-
-  // convert result array to object with key/value pairs, "A": "correct"
-  // let result = {};
-  // for (let i = 0; i < guess.length; i++) {
-  //   result[guess[i]] = resultArray[i];
-  // }
 
   console.log(resultArray);
   return resultArray;
