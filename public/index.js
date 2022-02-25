@@ -3,7 +3,7 @@ const guessText = document.querySelector(".guess");
 const guessInput = document.getElementById("guess");
 
 let word = "";
-let count = 0;
+
 
 letterInputs.forEach(input => input.addEventListener("keyup", (e)=> {
     console.log(e.key);
@@ -11,11 +11,13 @@ letterInputs.forEach(input => input.addEventListener("keyup", (e)=> {
     if(e.key == "Enter") {
         // Submit form?
     }
+    else if (e.key == "Shift") {
+        //ignore
+    }
     else if(e.key === "Backspace") {
-        if (count > 0 ) {
+        if (word.length > 0 ) {
             word = word.slice(0, -1);
             //guessText.textContent = word;
-            count--;
 
             if (input.previousElementSibling) {
                 input.previousElementSibling.focus();
@@ -24,13 +26,14 @@ letterInputs.forEach(input => input.addEventListener("keyup", (e)=> {
         }   
     }
     else {
-        if(count < 7 ) {
-            count++;
+        if(word.length < 7 ) {
             word += input.value;
             //guessText.textContent = word;
             guessInput.value = word;
             
-            e.target.value && input.nextElementSibling.focus();            
+            if (input.nextElementSibling) {
+                e.target.value && input.nextElementSibling.focus();  
+            }
         }
     }
 }));
