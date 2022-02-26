@@ -1,33 +1,55 @@
-let express = require("express");
-let path = require("path");
-let app = express();
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 var expressSession = require('express-session');
-const { Router } = require("express");
-const res = require("express/lib/response");
+
+var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-// parse urlencoded request body
-app.use(express.urlencoded({ extended: true }));
-
-app.use(expressSession({
+app.use( expressSession({
   resave: false,
   saveUninitialized: false,
-  secret: "super $secret phrase 123"
+  secret: "super $ecret phrase 123", 
   cookie: {
-    maxAge: 1000*60*10
+    maxAge: 1000*60*10 // in ms
   }
-}));
+}) );
 
-app.get('/v1', (req, res)=> {
-  res.render('v1');
+app.use(express.static(path.join(__dirname, 'public')));
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
 });
 
-app.post("/v1", (req, res)=> {
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;
+
+app.get('/v2', (req, res)=> {
+  res.render('v2');
+});
+
+app.post("/v2", (req, res)=> {
 
   let secretWord = "hebrews".toUpperCase();
 
@@ -50,7 +72,7 @@ app.post("/v1", (req, res)=> {
   console.log(result);
 
   // return the guess
-  res.render('v1', {result: result} ) ;
+  res.render('v2', {result: result} ) ;
 
 });
 
@@ -77,7 +99,7 @@ app.post("/v2", (req, res)=> {
   console.log(result);
 
   // return the guess
-  res.render('v1', {result: result} ) ;
+  res.render('v2', {result: result} ) ;
 
 });
 
@@ -88,3 +110,4 @@ const hostname = process.env.hostname || "localhost";
 app.listen(port, () => {
   console.log(`Running server on http://${hostname}:${port}`);
 });
+ 
