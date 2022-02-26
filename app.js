@@ -1,6 +1,9 @@
 let express = require("express");
 let path = require("path");
 let app = express();
+var router = express.Router();
+
+//var session = require('express-session')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -66,59 +69,99 @@ app.post("/v1", (req, res)=> {
 });
 
 
-/* EXAMPLE */
-
-let mark = { first: "Mark", last: "Hamill", age: "70" };
-
-app.get("/example/:age", (req, res) => {
-  let ageSentence = "";
-  const age = parseInt(req.params.age);
-
-  if (age > mark.age) {
-    ageSentence = "You're older than Mark Hamill!";
-  } else if (age < mark.age) {
-    ageSentence = "You're younger than Mark Hamill!";
-  } else {
-    ageSentence = "You are Mark Hamill!";
-  }
-  const page = `<html>
-                    <head> </head>
-                    <body> 
-                      <h1> Example </h1>
-                      <p> ${ageSentence} </p>
-                    </body>
-                </html>`;
-
-  //res.render('index', ageSentence);
-
-  res.send(page);
+app.get('/v2', (req, res)=> {
+  res.render('v2');
 });
 
 
-app.post('/example', (req,res) => {
+app.post("/v2", (req, res)=> {
 
-  let age = req.body.age;
+  let secretWord = "hebrews".toUpperCase();
 
-  if (age > mark.age) {
-    ageSentence = "You're older than Mark Hamill!";
-  } else if (age < mark.age) {
-    ageSentence = "You're younger than Mark Hamill!";
-  } else {
-    ageSentence = "You are Mark Hamill!";
+  // extract the guess value from the body
+  const guess = req.body.guess.toUpperCase();
+
+
+  function computeResult(guess, secretWord) {
+    
+    let result = []
+    let answer = ''
+    
+    for ( let i = 0; i < 7; i++) {
+
+    if (guess[i] === secretWord[i]) {
+        answer = 'correct';
+    }
+
+    else if( secretWord.includes(guess[i]) ) {
+        answer = 'misplaced';
+    }
+
+    else {
+        answer = 'incorrect';
+        
+    }
+
+
+    result.push({letter:guess[i], status: answer}) 
+
+    } //end of the for loop
+
+
+    return result;
   }
-  const page = `<html>
-                    <head> </head>
-                    <body> 
-                      <h1> Example </h1>
-                      <p> ${ageSentence} </p>
-                    </body>
-                </html>`;
 
-  //res.render('index', ageSentence);
+  let guesses = [];
 
-  res.send(page);
+  let result = computeResult(guess, secretWord); // = computeResult();
+  //guesses.push(result)
+  //req.session.guesses = guesses;
+
+
+
+  console.log(secretWord);
+  //console.log(secretWord);
+
+  // return the guess
+  res.render('v2', {result: result} ) ;
 
 });
+
+
+router.get('/', function(req, res, next) {
+
+  if( !req.session.guesses) {
+    req.session.guesses = [];
+  }
+
+  // get names from session
+  let guesses = req.session.guesses;
+
+  res.render('index', { 
+    guesses:guesses
+  });
+});
+
+
+
+router.post('/', function(req, res) {
+
+  if(!req.session.guesses) {
+    req.session.guesses = [];
+  }
+  const newGuess = req.body.guesses;
+  req.session.guesses.push(newGuess);
+
+  res.render('index', {guesses: req.session.guesses});
+
+});
+
+module.exports = router;
+
+
+
+
+
 
 
 const port = process.env.PORT || 3000;

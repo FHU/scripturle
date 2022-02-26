@@ -1,0 +1,55 @@
+<div class="container">
+
+  <header>
+    <a href="/" class="logo"><i class="fas fa-bible"></i></a>
+    <h1>THYWORDLE</h1>
+    <a href="" class="settings"><i class="fas fa-cog"></i></a>
+  </header>
+
+  <main>
+
+    <div class="row">
+
+      {{#each result}}
+
+        <input
+        type="text"
+        text=""
+        class="letter {{status}}"
+        maxlength="1"
+        disabled
+        value="{{letter}}"
+      />
+
+      {{/each}}
+
+    </div>
+
+
+
+    <div class="row">
+    
+      <input type="text" text="" class="letter" maxlength="1" autofocus />
+      <input type="text" text="" class="letter" maxlength="1" />
+      <input type="text" text="" class="letter" maxlength="1" />
+      <input type="text" text="" class="letter" maxlength="1" />
+      <input type="text" text="" class="letter" maxlength="1" />
+      <input type="text" text="" class="letter" maxlength="1" />
+      <input type="text" text="" class="letter" maxlength="1" />
+
+    </div>
+
+    <div class="wordContainer">
+      {{!-- <h2 class="guess"></h2> --}}
+
+      <form action="/v2" method="post">
+        <p>
+          <input type="hidden" name="guess" id="guess" />
+        </p>
+
+        <input type="submit" value="Guess" />
+      </form>
+    </div>
+  </main>
+
+</div>
