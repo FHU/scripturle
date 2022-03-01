@@ -3,7 +3,7 @@ let path = require("path");
 let app = express();
 var router = express.Router();
 
-//var session = require('express-session')
+var session = require('express-session')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -13,6 +13,15 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
+
+app.set('trust proxy', 1)
+app.use(session({
+  secret: 'terces',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
+
 
 app.get('/v1', (req, res)=> {
   res.render('v1');
@@ -70,7 +79,20 @@ app.post("/v1", (req, res)=> {
 
 
 app.get('/v2', (req, res)=> {
-  res.render('v2');
+
+  let message = "";
+  let gameover= false;
+
+  if( !req.session.guesses) {
+    req.session.guesses = [];
+  }
+
+  let guesses = req.session.guesses;
+
+  req.session.guesses = guesses;
+  res.render('v2', {result: guesses, message:message, gameover: gameover});
+
+
 });
 
 
@@ -102,7 +124,6 @@ app.post("/v2", (req, res)=> {
         
     }
 
-
     result.push({letter:guess[i], status: answer}) 
 
     } //end of the for loop
@@ -111,56 +132,46 @@ app.post("/v2", (req, res)=> {
     return result;
   }
 
-  let guesses = [];
-
   let result = computeResult(guess, secretWord); // = computeResult();
-  //guesses.push(result)
-  //req.session.guesses = guesses;
 
 
-
-  console.log(secretWord);
-  //console.log(secretWord);
-
-  // return the guess
-  res.render('v2', {result: result} ) ;
-
-});
-
-
-router.get('/', function(req, res, next) {
-
-  if( !req.session.guesses) {
+   if( !req.session.guesses) {
     req.session.guesses = [];
   }
+
+  let message = ""
+  let gameover = false;
+
 
   // get names from session
   let guesses = req.session.guesses;
 
-  res.render('index', { 
-    guesses:guesses
-  });
-});
+  req.session.guesses = guesses;
 
+  //if the length of guesses is 7 and message is empty 
+  guesses.push(result)
 
+  if (guess === secretWord) {
+    message = "Congratulations! You got the word!";
+    gameover = true;
+  }
 
-router.post('/', function(req, res) {
+  if (guesses.length == 7) {
+    if (message === "") {
+      message = "You lost, the word was " + secretWord;
+      gameover = true;
+    }
+  }
 
-  if(!req.session.guesses) {
+  if (gameover) {
     req.session.guesses = [];
   }
-  const newGuess = req.body.guesses;
-  req.session.guesses.push(newGuess);
 
-  res.render('index', {guesses: req.session.guesses});
+  // return the guess
+  res.render('v2', {result: guesses, message:message, gameover: gameover} ) ;
+
 
 });
-
-module.exports = router;
-
-
-
-
 
 
 

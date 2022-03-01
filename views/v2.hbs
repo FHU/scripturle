@@ -8,27 +8,35 @@
 
   <main>
 
-    <div class="row">
-
+      
       {{#each result}}
+        <div class="row">
 
-        <input
-        type="text"
-        text=""
-        class="letter {{status}}"
-        maxlength="1"
-        disabled
-        value="{{letter}}"
-      />
+          {{#each this}}
 
+                <input
+                type="text"
+                text=""
+                class="letter {{status}}"
+                maxlength="1"
+                disabled
+                value="{{letter}}"
+              />
+
+          {{/each}}
+        </div>
       {{/each}}
 
-    </div>
+      {{#if message }}
+
+          <h2> {{message}}</h2>
+          
+      {{/if}}
 
 
+  {{#unless gameover }}
 
     <div class="row">
-    
       <input type="text" text="" class="letter" maxlength="1" autofocus />
       <input type="text" text="" class="letter" maxlength="1" />
       <input type="text" text="" class="letter" maxlength="1" />
@@ -36,11 +44,11 @@
       <input type="text" text="" class="letter" maxlength="1" />
       <input type="text" text="" class="letter" maxlength="1" />
       <input type="text" text="" class="letter" maxlength="1" />
-
     </div>
 
+
+
     <div class="wordContainer">
-      {{!-- <h2 class="guess"></h2> --}}
 
       <form action="/v2" method="post">
         <p>
@@ -50,6 +58,13 @@
         <input type="submit" value="Guess" />
       </form>
     </div>
+
+  {{/unless}}
+
+
   </main>
 
 </div>
+
+
+
