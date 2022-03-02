@@ -28,9 +28,9 @@ app.use( expressSession({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+//app.use(function(req, res, next) {
+  //next(createError(404));
+//});
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -45,42 +45,11 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 
-app.get('/v2', (req, res)=> {
-  res.render('v2');
+app.get('/v1', (req, res)=> {
+  res.render('v1');
 });
 
-app.post("/v2", (req, res)=> {
-
-  let secretWord = "hebrews".toUpperCase();
-
-  // extract the guess value from the body
-  const guess = req.body.guess.toUpperCase();
-
-  let result = []; // = computeResult();
-
-  for  (let i = 0; i < 7; i++) {
-    if (guess[i] === secretWord[i]) {
-      result.push(  {pop: 'correct',
-                    letter: guess[i]})
-    }
-    else {
-      result.push(  {pop: 'incorrect',
-                    letter: guess[i]})
-    }
-  }
-
-  console.log(result);
-
-  // return the guess
-  res.render('v2', {result: result} ) ;
-
-});
-
-app.get('/v2', (req, res)=> {
-  res.render('v2');
-});
-
-app.post("/v2", (req, res)=> {
+app.post("/v1", (req, res)=> {
 
   let secretWord = "hebrews".toUpperCase();
 
@@ -99,7 +68,50 @@ app.post("/v2", (req, res)=> {
   console.log(result);
 
   // return the guess
-  res.render('v2', {result: result} ) ;
+  res.render('v1', {result: result} ) ;
+
+});
+
+app.get('/v2', (req, res)=> {
+  if(!req.session.guess) {
+    req.session.guess = [];
+  }
+  guesses = req.session.guess
+  res.render('v2', {guesses:guesses});
+});
+
+app.post("/v2", (req, res)=> {
+
+  let secretWord = "hebrews".toUpperCase();
+
+  // extract the guess value from the body
+  const guess = req.body.guess.toUpperCase();
+
+  let result = []; // = computeResult();
+
+  
+  for  (let i = 0; i < 7; i++) {
+    if (guess[i] === secretWord[i]) {
+      result.push(  {pop: 'correct',
+                    letter: guess[i]})
+    }
+    else {
+      if(secretWord.includes(guess[i])) {
+        result.push(  {pop: 'misplaced',
+                      letter: guess[i]})
+      }
+      else {
+      result.push(  {pop: 'incorrect',
+                    letter: guess[i]})
+      }
+    }
+  }
+
+  console.log(result);
+  req.session.guess.push(result);
+
+  // return the guess
+  res.render('v2', {guesses: req.session.guess} ) ;
 
 });
 
