@@ -1,21 +1,42 @@
-let express = require("express");
-let path = require("path");
-let app = express();
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var expressSession = require('express-session');
 
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+
+var app = express();
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "public")));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/v1", (req, res) => {
-  res.render("v1");
+app.use( expressSession({
+  resave: false,
+  saveUninitialized: false,
+  secret: "super $ecret phrase 123", 
+  cookie: {
+    maxAge: 1000*60*10 // in ms
+  }
+}) );
+
+app.get("/v2", (req, res) => {
+  res.render("v2");
 });
 
-app.post("/v1", (req, res) => {
+app.post("/v2", (req, res) => {
   let secretWord = "HEBREWS".toUpperCase();
 
   // extract the guess value from the body
